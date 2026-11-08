@@ -43,7 +43,7 @@
     <label>Industrial Supervisor's Name:</label>
     <input type="text" id="supName" placeholder="e.g., Mr. J. Doe">
 
-    <label>Paste your Logbook Entries:</label>
+    <label>Paste your Logbook Entries (Raw notes):</label>
     <textarea id="logbook" rows="5" placeholder="e.g., Week 1: Orientation, setup of workstation. Week 2: Learned networking basics..."></textarea>
 
     <button onclick="generateDoc()">Generate Word Document</button>
@@ -56,7 +56,7 @@
         status.innerText = "Generating... Please wait.";
 
         if (typeof docx === 'undefined') {
-            status.innerText = "Error: Still cannot load the Word library. Your internet provider might be blocking the script. Try using a VPN or different network.";
+            status.innerText = "Error: Word library not loaded. Ensure index.js is in your repository.";
             status.style.color = "red";
             return;
         }
@@ -70,13 +70,32 @@
         const end = document.getElementById('endDate').value || "[End Date]";
         const hod = document.getElementById('hodName').value || "[HOD's Name]";
         const sup = document.getElementById('supName').value || "[Supervisor's Name]";
-        const logbook = document.getElementById('logbook').value || "[Logbook entries]";
+        
+        // If they leave logbook empty, we put a placeholder
+        const rawLogbook = document.getElementById('logbook').value || "Week 1: Orientation. Week 2: Training began.";
+        
+        // This formats the logbook into paragraphs instead of one big block of text
+        const logbookParagraphs = rawLogbook.split('\n').map(line => {
+            return new Paragraph({
+                alignment: AlignmentType.JUSTIFIED,
+                spacing: { line: 480, lineRule: "auto" },
+                children: [new TextRun({ text: line, font: "Times New Roman", size: 24 })]
+            });
+        });
 
         const formatText = (text, bold = false) => {
             return new Paragraph({
                 alignment: AlignmentType.JUSTIFIED,
                 spacing: { line: 480, lineRule: "auto" },
                 children: [new TextRun({ text: text, font: "Times New Roman", size: 24, bold: bold })]
+            });
+        };
+
+        const helperText = (text) => {
+            return new Paragraph({
+                alignment: AlignmentType.JUSTIFIED,
+                spacing: { line: 480, lineRule: "auto" },
+                children: [new TextRun({ text: text, font: "Times New Roman", size: 24, italics: true, color: "FF0000" })]
             });
         };
 
@@ -123,61 +142,85 @@
 
                     new Paragraph({ pageBreakBefore: true }),
                     formatHeading("ABSTRACT"),
-                    formatText(`An abstract for a SIWES report should be a concise summary, that provides an overview of the report. It should include the relevance of the SIWES program, a summary of the activities undertaken, the skills acquired, the challenges faced and how they were addressed, and the overall outcome of the experience. The abstract should be written in a clear and professional tone, highlighting the key aspects of the training without going into extensive details.`),
-                    formatText(`[Note: Replace this text with your actual abstract in Word. Single line spacing, Times New Roman, Font Size 12, Justified.]`),
+                    formatText(`This report presents a detailed account of my industrial work experience at ${company}, undertaken from ${start} to ${end}. The Students' Industrial Work Experience Scheme (SIWES) is a vital program designed to bridge the gap between theoretical classroom learning and practical industrial application. During this period, I was exposed to real-world technical environments, which allowed me to develop both hard and soft skills. The report highlights the specific activities carried out, projects executed, and the technical skills acquired in the field of computer science. It also discusses the challenges encountered during the training and the solutions implemented to overcome them. Ultimately, the training provided invaluable practical exposure, preparing me for future professional roles in the technology sector.`),
 
                     new Paragraph({ pageBreakBefore: true }),
                     formatHeading("CHAPTER ONE"),
+                    
                     formatHeading("1.1 Introduction to Industrial Training"),
-                    formatText("[Write your introduction here...]"),
+                    formatText(`Industrial training is a mandatory component of the academic curriculum for students in various tertiary institutions. It is a structured program designed to expose students to the realities of the corporate world and the practical applications of their academic studies. The Students' Industrial Work Experience Scheme (SIWES) is the principal regulatory framework for this exercise in Nigeria. It provides a platform for students to transition from the theoretical environment of the classroom to the practical, dynamic, and often demanding environment of the industry.`),
+                    formatText(`The training is essential because it allows students to develop technical competencies, understand workplace ethics, and build professional networks. By participating in this scheme, students are better prepared to face the challenges of the modern workforce upon graduation.`),
+                    
                     formatHeading("1.2 Objective of Industrial Training"),
-                    formatText("[Write the objectives here...]"),
+                    formatText(`The primary objective of the industrial training is to provide students with hands-on experience in their respective fields of study. This is achieved through the following specific goals:`),
+                    formatText(`To apply the theoretical knowledge acquired in the university to solve practical, real-world problems in an industrial setting.`),
+                    formatText(`To expose students to modern tools, equipment, and technologies that are currently used in the industry, which may not be readily available in the university laboratories.`),
+                    formatText(`To develop essential soft skills, including communication, teamwork, time management, and problem-solving, which are critical for professional success.`),
+                    formatText(`To provide an opportunity for students to interact with professionals in their field, thereby building networks and gaining mentorship.`),
+                    
                     formatHeading("1.3 SIWES Regulatory Agencies"),
-                    formatText("[Write about ITF, NUC, etc...]"),
+                    formatText(`The SIWES program is governed and coordinated by several key bodies. The Industrial Training Fund (ITF) is the primary agency responsible for the funding and overall administration of the scheme. The National Universities Commission (NUC) provides the policy framework and guidelines for the implementation of the program within universities. Additionally, the institution (Edo State University Iyamho) has a dedicated SIWES coordinator and departmental coordinators who oversee the placement, monitoring, and evaluation of students during their training.`),
+                    
                     formatHeading("1.4 Benefits of Industrial Training to Students"),
-                    formatText("[Write the benefits here...]"),
+                    formatText(`The benefits of the SIWES program to a student are multifaceted. It provides a realistic preview of the professional world, helping students to confirm their career choices. It enhances their employability by adding practical experience to their resume. The training also helps in developing a strong work ethic, discipline, and the ability to work under pressure. Furthermore, students gain confidence in their abilities and acquire specific technical skills that give them a competitive edge in the job market.`),
 
                     new Paragraph({ pageBreakBefore: true }),
                     formatHeading("CHAPTER TWO"),
+                    
                     formatHeading("2.1 History of Place of Attachment"),
-                    formatText(`[Write the history of ${company} here...]`),
+                    helperText(`[NOTE: Add the actual history of ${company} here. When was it founded? Who founded it? What is its core business? Delete this red text when done.]`),
+                    
                     formatHeading("2.2 Objectives of the Establishment"),
-                    formatText("[Write the objectives here...]"),
+                    helperText(`[NOTE: Add the mission and vision of ${company} here. What are their main goals? Delete this red text when done.]`),
+                    
                     formatHeading("2.3 Organogram of the Establishment"),
-                    formatText(`[Insert the organogram of ${company} here in Word. Make sure to label it "Figure 2.1: Organogram of ${company}"]`),
+                    formatText(`The organizational structure of ${company} is designed to ensure efficient operation, clear lines of authority, and effective communication across all departments. The structure comprises various levels of management and operational units that work cohesively to achieve the company's objectives.`),
+                    helperText(`[NOTE: Delete this red text. Insert an image of the company's organogram here in Word. Make sure to label it "Figure 2.1: Organogram of ${company}"]`),
+                    
                     formatHeading("2.4 Departments/Units in the Establishment and Their Functions"),
-                    formatText("[Write about the departments here...]"),
+                    helperText(`[NOTE: List the departments (e.g., HR, IT, Finance, Operations) and explain what each department does. Delete this red text when done.]`),
 
                     new Paragraph({ pageBreakBefore: true }),
                     formatHeading("CHAPTER THREE"),
+                    
                     formatHeading("3.1 Activities Carried Out During the Period of Attachment"),
-                    formatText(logbook),
+                    formatText(`Throughout my industrial attachment at ${company}, I was actively involved in various daily operations, which provided me with a comprehensive learning experience. My activities were carefully supervised and aligned with the goals of the department I was assigned to. Below is a summary of the activities carried out based on my weekly logbook:`),
+                    
+                    ...logbookParagraphs, // Inserts the formatted logbook here
+                    
+                    helperText(`[NOTE: You can expand on the activities listed above in clear paragraphs. Explain the details of what you actually did day-to-day. Delete this red text when done.]`),
+                    
                     formatHeading("3.2 Projects Executed"),
-                    formatText("[Write about the projects you executed here...]"),
+                    helperText(`[NOTE: Describe the specific projects you worked on. Did you build a website? Fix a network? Design a database? Explain your role. Insert screenshots of your work here and label them Figure 3.1, Figure 3.2, etc. Delete this red text.]`),
+                    
                     formatHeading("3.3 Skills Acquired"),
-                    formatText("[Write about the skills you acquired here...]"),
+                    formatText(`During the course of my industrial training, I acquired a diverse range of technical and soft skills. On the technical side, I gained practical proficiency in areas such as system maintenance, networking, and software applications. I also developed strong soft skills, including effective communication, teamwork, problem-solving, and time management, which are essential for thriving in a professional environment.`),
 
                     new Paragraph({ pageBreakBefore: true }),
                     formatHeading("CHAPTER FOUR"),
+                    
                     formatHeading("4.1 Problems Encountered During the Period of Attachment"),
-                    formatText("[Write about the problems you encountered here...]"),
+                    helperText(`[NOTE: What challenges did you face? (e.g., unstable power supply, lack of internet, difficulty understanding a new programming language, complex company protocols). Delete this red text.]`),
+                    
                     formatHeading("4.2 Solutions Implemented"),
-                    formatText("[Write about how you solved them here...]"),
+                    helperText(`[NOTE: How did you overcome the problems you listed above? (e.g., used offline documentation, asked supervisors for help, brought a power bank). Delete this red text.]`),
 
                     new Paragraph({ pageBreakBefore: true }),
                     formatHeading("CHAPTER FIVE"),
+                    
                     formatHeading("5.1 Conclusion"),
-                    formatText("[Write your conclusion here...]"),
+                    formatText(`My industrial work experience at ${company} was highly rewarding and educational. It provided a vital bridge between the theoretical concepts taught in the university and the practical realities of the Information Technology industry. I was able to apply my academic knowledge to real-world scenarios, which significantly deepened my understanding of computer science. The training not only improved my technical competencies but also instilled in me a sense of professional responsibility, discipline, and teamwork. I am confident that the skills and experiences gained during this period will be invaluable as I complete my degree and embark on my professional career.`),
+                    
                     formatHeading("5.2 Recommendations"),
-                    formatText("[Write your recommendations here...]"),
+                    helperText(`[NOTE: What should ${company} improve on? Would you recommend them to future interns? What should the University improve? Delete this red text.]`),
 
                     new Paragraph({ pageBreakBefore: true }),
                     formatHeading("REFERENCES"),
-                    formatText("[List your references here...]"),
+                    helperText(`[NOTE: Delete this red text. List any books, websites, or materials you used here. Follow APA format if possible.]`),
 
                     new Paragraph({ pageBreakBefore: true }),
                     formatHeading("APPENDIX"),
-                    formatText("[Insert your appendices here...]"),
+                    helperText(`[NOTE: Delete this red text. Insert any extra materials here, like your weekly logbook photocopy, sample codes, or questionnaires.]`),
                 ]
             }]
         });
@@ -185,16 +228,13 @@
         // Generate the file
         Packer.toBlob(doc).then(blob => {
             const fileName = name.replace(/\s+/g, '_') + "_SIWES_Report.docx";
-            
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.style.display = "none";
             a.href = url;
             a.download = fileName;
-            
             document.body.appendChild(a);
             a.click();
-            
             setTimeout(() => {
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
